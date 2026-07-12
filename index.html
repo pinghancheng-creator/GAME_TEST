@@ -372,6 +372,194 @@
     justify-content: center;
     gap: 0.5rem 1rem;
   }
+
+  /* ---------- AI 家教聊天泡泡 ---------- */
+  .chat-bubble {
+    position: fixed;
+    top: 1.1rem;
+    right: 1.1rem;
+    z-index: 1000;
+    width: 3.4rem;
+    height: 3.4rem;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #0084ff, #00c6ff);
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 132, 255, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .chat-bubble:hover { transform: scale(1.06); }
+  .chat-bubble:active { transform: scale(0.95); }
+
+  .chat-bubble img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .chat-avatar {
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex: 0 0 auto;
+    background: #fff;
+  }
+
+  .chat-panel {
+    position: fixed;
+    top: 5rem;
+    right: 1.1rem;
+    z-index: 1000;
+    width: min(340px, calc(100vw - 2.2rem));
+    height: min(480px, calc(100vh - 7rem));
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+    transform-origin: top right;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+
+  .chat-panel.hidden {
+    opacity: 0;
+    transform: scale(0.92);
+    pointer-events: none;
+  }
+
+  .chat-header {
+    background: linear-gradient(135deg, #0084ff, #00c6ff);
+    color: #fff;
+    padding: 0.85rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 0 0 auto;
+  }
+
+  .chat-header-title {
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .chat-close {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.2rem;
+    opacity: 0.9;
+  }
+
+  .chat-close:hover { opacity: 1; }
+
+  .chat-messages {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: #f0f2f5;
+  }
+
+  .chat-msg-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.4rem;
+    max-width: 88%;
+  }
+
+  .chat-msg-row.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+
+  .chat-msg-row.bot { align-self: flex-start; }
+
+  .chat-msg {
+    padding: 0.55rem 0.8rem;
+    border-radius: 18px;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .chat-msg.bot {
+    background: #e4e6eb;
+    color: #050505;
+    border-bottom-left-radius: 4px;
+  }
+
+  .chat-msg.user {
+    background: linear-gradient(135deg, #0084ff, #00c6ff);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+
+  .chat-msg.typing {
+    background: #e4e6eb;
+    color: #65676b;
+    font-style: italic;
+  }
+
+  .chat-input-row {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem;
+    background: #fff;
+    border-top: 1px solid #e4e6eb;
+  }
+
+  .chat-input-row input {
+    flex: 1 1 auto;
+    border: none;
+    background: #f0f2f5;
+    border-radius: 999px;
+    padding: 0.55rem 0.9rem;
+    font-size: 0.9rem;
+    color: #050505;
+    outline: none;
+    font-family: inherit;
+  }
+
+  .chat-send {
+    flex: 0 0 auto;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    border: none;
+    background: #0084ff;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.15s ease, transform 0.08s ease;
+  }
+
+  .chat-send:hover { opacity: 0.88; }
+  .chat-send:active { transform: scale(0.92); }
+  .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -687,6 +875,119 @@
   }
 
   init();
+</script>
+
+<!-- ---------- AI 家教聊天泡泡 ---------- -->
+<div id="chat-panel" class="chat-panel hidden" role="dialog" aria-label="AI 家教對話視窗">
+  <div class="chat-header">
+    <div class="chat-header-title"><img src="SRC/111.png" alt="能源小教練頭像" class="chat-avatar">能源小教練</div>
+    <button type="button" id="chat-close" class="chat-close" aria-label="關閉對話">✕</button>
+  </div>
+  <div id="chat-messages" class="chat-messages"></div>
+  <form id="chat-form" class="chat-input-row">
+    <input id="chat-input" type="text" placeholder="問問能源轉型的問題吧…" autocomplete="off" />
+    <button type="submit" class="chat-send" aria-label="送出">➤</button>
+  </form>
+</div>
+<button type="button" id="chat-bubble" class="chat-bubble" aria-label="打開 AI 家教對話"><img src="SRC/111.png" alt="AI 家教頭像"></button>
+
+<script>
+  (function () {
+    const bubble = document.getElementById("chat-bubble");
+    const panel = document.getElementById("chat-panel");
+    const closeBtn = document.getElementById("chat-close");
+    const form = document.getElementById("chat-form");
+    const input = document.getElementById("chat-input");
+    const messagesEl = document.getElementById("chat-messages");
+
+    const chatHistory = [];
+    let isWaiting = false;
+
+    function addMessage(role, text) {
+      const isUser = role === "user";
+      const rowEl = document.createElement("div");
+      rowEl.className = `chat-msg-row ${isUser ? "user" : "bot"}`;
+
+      if (!isUser) {
+        const avatar = document.createElement("img");
+        avatar.src = "SRC/111.png";
+        avatar.alt = "能源小教練頭像";
+        avatar.className = "chat-avatar";
+        rowEl.appendChild(avatar);
+      }
+
+      const bubbleEl = document.createElement("div");
+      bubbleEl.className = `chat-msg ${isUser ? "user" : "bot"}`;
+      bubbleEl.textContent = text;
+      rowEl.appendChild(bubbleEl);
+
+      messagesEl.appendChild(rowEl);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      return rowEl;
+    }
+
+    function togglePanel(open) {
+      const show = open !== undefined ? open : panel.classList.contains("hidden");
+      panel.classList.toggle("hidden", !show);
+      if (show) {
+        if (messagesEl.children.length === 0) {
+          addMessage("bot", "嗨！我是能源小教練 ⚡ 有任何關於發電量、成本、排碳或環境風險的問題，都可以問我，我會陪你一起找到通關的平衡點！");
+        }
+        input.focus();
+      }
+    }
+
+    bubble.addEventListener("click", () => togglePanel());
+    closeBtn.addEventListener("click", () => togglePanel(false));
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text || isWaiting) return;
+
+      addMessage("user", text);
+      chatHistory.push({ role: "user", content: text });
+      input.value = "";
+      isWaiting = true;
+
+      const typingRow = document.createElement("div");
+      typingRow.className = "chat-msg-row bot";
+      const typingAvatar = document.createElement("img");
+      typingAvatar.src = "SRC/111.png";
+      typingAvatar.alt = "能源小教練頭像";
+      typingAvatar.className = "chat-avatar";
+      const typingEl = document.createElement("div");
+      typingEl.className = "chat-msg typing";
+      typingEl.textContent = "能源小教練輸入中…";
+      typingRow.appendChild(typingAvatar);
+      typingRow.appendChild(typingEl);
+      messagesEl.appendChild(typingRow);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text, history: chatHistory.slice(-10) }),
+        });
+
+        const data = await res.json();
+        typingRow.remove();
+
+        if (!res.ok) {
+          addMessage("bot", data.error || "抱歉，AI 家教暫時無法回應，請稍後再試。");
+        } else {
+          addMessage("bot", data.reply);
+          chatHistory.push({ role: "assistant", content: data.reply });
+        }
+      } catch (err) {
+        typingRow.remove();
+        addMessage("bot", "連線發生問題，請確認網路後再試一次。");
+      } finally {
+        isWaiting = false;
+      }
+    });
+  })();
 </script>
 
 </body>
