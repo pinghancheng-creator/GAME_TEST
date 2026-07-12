@@ -903,6 +903,16 @@
     const chatHistory = [];
     let isWaiting = false;
 
+    function escapeHTML(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function formatMessageText(text) {
+      return escapeHTML(text).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    }
+
     function addMessage(role, text) {
       const isUser = role === "user";
       const rowEl = document.createElement("div");
@@ -918,7 +928,7 @@
 
       const bubbleEl = document.createElement("div");
       bubbleEl.className = `chat-msg ${isUser ? "user" : "bot"}`;
-      bubbleEl.textContent = text;
+      bubbleEl.innerHTML = formatMessageText(text);
       rowEl.appendChild(bubbleEl);
 
       messagesEl.appendChild(rowEl);
