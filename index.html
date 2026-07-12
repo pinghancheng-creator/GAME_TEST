@@ -362,6 +362,180 @@
     color: var(--red);
   }
 
+  .hidden-page { display: none !important; }
+
+  .start-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .start-card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem 1.6rem;
+    text-align: center;
+  }
+
+  .start-card h1 {
+    margin: 0 0 0.5rem;
+    font-size: 1.5rem;
+  }
+
+  .start-card p {
+    margin: 0 0 1.4rem;
+    color: var(--sub-text);
+    font-size: 0.9rem;
+  }
+
+  .start-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: left;
+  }
+
+  .start-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    color: var(--sub-text);
+  }
+
+  .start-form input,
+  .start-form select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 0.7rem;
+    color: var(--text);
+    font-size: 1rem;
+    font-family: inherit;
+  }
+
+  .start-form input:focus,
+  .start-form select:focus {
+    outline: 2px solid var(--accent);
+  }
+
+  .start-form button {
+    margin-top: 0.4rem;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #0f172a;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .start-form button:hover { opacity: 0.88; }
+
+  .start-error {
+    color: var(--red);
+    font-size: 0.82rem;
+    min-height: 1.1rem;
+  }
+
+  .game-timer {
+    margin-top: 0.6rem;
+    display: inline-block;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.3rem 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .game-timer.warning { color: var(--red); }
+
+  .result-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .result-card {
+    width: 100%;
+    max-width: 640px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.8rem;
+  }
+
+  .result-card h1 {
+    margin: 0 0 0.3rem;
+    font-size: 1.4rem;
+    text-align: center;
+  }
+
+  .result-sub {
+    text-align: center;
+    color: var(--sub-text);
+    font-size: 0.9rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.4rem;
+    font-size: 0.9rem;
+  }
+
+  .result-table th,
+  .result-table td {
+    padding: 0.55rem 0.5rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-table th {
+    color: var(--sub-text);
+    font-weight: 600;
+    font-size: 0.82rem;
+  }
+
+  .result-summary {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+    margin-bottom: 1.4rem;
+  }
+
+  @media (min-width: 480px) {
+    .result-summary { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .restart-btn {
+    display: block;
+    margin: 0 auto;
+    padding: 0.75rem 1.6rem;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #0f172a;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .restart-btn:hover { opacity: 0.88; }
+
   .goal-detail {
     margin-top: 0.6rem;
     font-size: 0.85rem;
@@ -564,9 +738,44 @@
 </head>
 <body>
 
+<div id="start-page" class="start-page">
+  <div class="start-card">
+    <h1>⚡ 能源轉型闖關遊戲</h1>
+    <p>開始挑戰前，請先填寫你的基本資料：</p>
+    <form id="start-form" class="start-form" novalidate>
+      <label>
+        姓名
+        <input type="text" id="player-name" placeholder="請輸入姓名" required>
+      </label>
+      <label>
+        性別
+        <select id="player-gender" required>
+          <option value="" disabled selected>請選擇性別</option>
+          <option value="男">男</option>
+          <option value="女">女</option>
+          <option value="其他">其他</option>
+        </select>
+      </label>
+      <label>
+        年齡
+        <input type="number" id="player-age" placeholder="請輸入年齡" min="1" max="120" required>
+      </label>
+      <label>
+        Email
+        <input type="email" id="player-email" placeholder="請輸入 Email" required>
+      </label>
+      <div class="start-error" id="start-error"></div>
+      <button type="submit">填入完成，開始遊戲</button>
+    </form>
+  </div>
+</div>
+
+<div id="game-page" class="hidden-page">
+
 <header>
   <h1>⚡ 能源轉型闖關遊戲</h1>
   <p>調整各種電廠的數量，找到發電量、成本、排碳與環境風險之間的平衡，挑戰成功通關！</p>
+  <div class="game-timer" id="game-timer">剩餘時間：02:00</div>
 </header>
 
 <section class="scene">
@@ -609,7 +818,118 @@
   </section>
 </main>
 
+</div>
+
+<div id="result-page" class="result-page hidden-page">
+  <div class="result-card">
+    <h1>⏰ 時間到！挑戰結果</h1>
+    <div class="result-sub" id="result-player"></div>
+
+    <table class="result-table">
+      <thead>
+        <tr>
+          <th>電廠</th>
+          <th>數量</th>
+          <th>發電量</th>
+        </tr>
+      </thead>
+      <tbody id="result-plants-body"></tbody>
+    </table>
+
+    <div class="result-summary">
+      <div class="summary-item">
+        <div class="label">總發電量</div>
+        <div class="amount" id="result-power">0</div>
+      </div>
+      <div class="summary-item">
+        <div class="label">累計碳排量</div>
+        <div class="amount" id="result-carbon">0</div>
+      </div>
+      <div class="summary-item">
+        <div class="label">總環境風險</div>
+        <div class="amount" id="result-risk">0</div>
+      </div>
+    </div>
+
+    <button type="button" class="restart-btn" id="restart-btn">重新挑戰</button>
+  </div>
+</div>
+
 <script>
+  // ---------- Google Apps Script 使用者資料 / 行為紀錄 ----------
+  // 部署 GAS 網頁應用程式後，把網址貼在這裡
+  const GAS_WEB_APP_URL = "YOUR_GAS_WEB_APP_URL_HERE";
+
+  const LOG_QUEUE_KEY = "energyGameLogQueue";
+  const LOG_BATCH_SIZE = 5;
+
+  let userName = "";
+  let userGender = "";
+  let userAge = "";
+  let userEmail = "";
+
+  let logQueue = [];
+  try {
+    logQueue = JSON.parse(localStorage.getItem(LOG_QUEUE_KEY) || "[]");
+  } catch (err) {
+    logQueue = [];
+  }
+
+  function persistLogQueue() {
+    localStorage.setItem(LOG_QUEUE_KEY, JSON.stringify(logQueue));
+  }
+
+  // 送資料到 GAS：用 text/plain 避免瀏覽器發出 CORS 預檢請求（GAS 網頁應用程式不處理 OPTIONS）
+  async function sendToGAS(payload) {
+    if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL === "YOUR_GAS_WEB_APP_URL_HERE") {
+      console.warn("尚未設定 GAS_WEB_APP_URL，略過送出：", payload);
+      return false;
+    }
+
+    try {
+      const res = await fetch(GAS_WEB_APP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload),
+      });
+      const text = await res.text();
+      return text.trim() === "OK";
+    } catch (err) {
+      console.error("送出至 GAS 失敗：", err);
+      return false;
+    }
+  }
+
+  function sendProfileToGAS(log) {
+    return sendToGAS({
+      timeStamp: new Date().toISOString(),
+      userName,
+      useGender: userGender,
+      useAge: userAge,
+      userEmail,
+      log,
+    });
+  }
+
+  // 每累積 5 筆事件，合併成一筆資料送到 GAS；成功才清除，失敗則暫存待下次再送
+  async function flushLogQueue() {
+    if (logQueue.length < LOG_BATCH_SIZE || !userName || !userEmail) return;
+
+    const batch = logQueue.slice(0, LOG_BATCH_SIZE);
+    const ok = await sendProfileToGAS(batch.join(" | "));
+
+    if (ok) {
+      logQueue = logQueue.slice(LOG_BATCH_SIZE);
+      persistLogQueue();
+    }
+  }
+
+  function recordLog(action) {
+    logQueue.push(`${new Date().toISOString()} ${action}`);
+    persistLogQueue();
+    flushLogQueue();
+  }
+
   const plants = [
     { id: "thermal", icon: "🔥", name: "火力發電廠", count: 8, power: 18, cost: 8, carbon: 16, risk: 8 },
     { id: "wind",    icon: "🌬️", name: "風力發電廠", count: 2, power: 12, cost: 10, carbon: 0, risk: 3 },
@@ -670,6 +990,7 @@
     plant.count = Math.max(0, plant.count + delta);
     renderPlants();
     updateSummary();
+    recordLog(`點擊按鈕：${delta > 0 ? "增加" : "減少"} ${plant.name}（目前數量 ${plant.count}）`);
   }
 
   function lerpColor(from, to, t) {
@@ -868,28 +1189,135 @@
     `;
   }
 
-  function init() {
-    renderPlants();
-    updateSummary();
-    setInterval(tickCarbon, 10000);
+  const GAME_DURATION_MS = 2 * 60 * 1000;
+  let carbonIntervalId = null;
+  let timerIntervalId = null;
+  let gameEndTime = null;
+  let player = { name: "", gender: "", age: "", email: "" };
+
+  function formatTime(ms) {
+    const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+    const m = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+    const s = String(totalSeconds % 60).padStart(2, "0");
+    return `${m}:${s}`;
   }
 
-  init();
+  function tickTimer() {
+    const remaining = gameEndTime - Date.now();
+    const timerEl = document.getElementById("game-timer");
+    timerEl.textContent = `剩餘時間：${formatTime(remaining)}`;
+    timerEl.classList.toggle("warning", remaining <= 20000);
+
+    if (remaining <= 0) {
+      endGame();
+    }
+  }
+
+  function startGame() {
+    document.getElementById("start-page").classList.add("hidden-page");
+    document.getElementById("game-page").classList.remove("hidden-page");
+    document.getElementById("chat-widget").classList.remove("hidden-page");
+
+    renderPlants();
+    updateSummary();
+
+    carbonIntervalId = setInterval(tickCarbon, 10000);
+
+    gameEndTime = Date.now() + GAME_DURATION_MS;
+    tickTimer();
+    timerIntervalId = setInterval(tickTimer, 1000);
+  }
+
+  function endGame() {
+    clearInterval(carbonIntervalId);
+    clearInterval(timerIntervalId);
+
+    const totals = calcTotals();
+
+    document.getElementById("result-player").textContent =
+      `${player.name}（${player.gender}／${player.age} 歲／${player.email}）的挑戰紀錄`;
+
+    const tbody = document.getElementById("result-plants-body");
+    tbody.innerHTML = plants
+      .map(
+        (p) => `
+      <tr>
+        <td>${p.icon} ${p.name}</td>
+        <td>${p.count}</td>
+        <td>${p.count * p.power}</td>
+      </tr>`
+      )
+      .join("");
+
+    document.getElementById("result-power").textContent = totals.power;
+    document.getElementById("result-carbon").textContent = totals.carbon;
+    document.getElementById("result-risk").textContent = totals.risk;
+
+    document.getElementById("game-page").classList.add("hidden-page");
+    document.getElementById("chat-widget").classList.add("hidden-page");
+    document.getElementById("result-page").classList.remove("hidden-page");
+
+    sendProfileToGAS(
+      `遊戲結束：發電量 ${totals.power}／碳排 ${totals.carbon}／風險 ${totals.risk}`
+    );
+  }
+
+  document.getElementById("start-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nameInput = document.getElementById("player-name");
+    const genderInput = document.getElementById("player-gender");
+    const ageInput = document.getElementById("player-age");
+    const emailInput = document.getElementById("player-email");
+    const errorEl = document.getElementById("start-error");
+
+    const name = nameInput.value.trim();
+    const gender = genderInput.value;
+    const age = ageInput.value;
+    const email = emailInput.value.trim();
+
+    if (!name || !gender || !age || !email) {
+      errorEl.textContent = "請完整填寫姓名、性別、年齡與 Email 後再開始遊戲。";
+      return;
+    }
+
+    if (!emailInput.checkValidity()) {
+      errorEl.textContent = "請輸入正確格式的 Email。";
+      return;
+    }
+
+    errorEl.textContent = "";
+    player = { name, gender, age, email };
+    userName = name;
+    userGender = gender;
+    userAge = age;
+    userEmail = email;
+
+    sendProfileToGAS("使用者輸入基本資料並開始遊戲");
+    flushLogQueue();
+    startGame();
+  });
+
+  document.getElementById("restart-btn").addEventListener("click", () => {
+    recordLog("點擊按鈕：重新挑戰");
+    location.reload();
+  });
 </script>
 
 <!-- ---------- AI 家教聊天泡泡 ---------- -->
-<div id="chat-panel" class="chat-panel hidden" role="dialog" aria-label="AI 家教對話視窗">
-  <div class="chat-header">
-    <div class="chat-header-title"><img src="SRC/111.png" alt="能源小教練頭像" class="chat-avatar">能源小教練</div>
-    <button type="button" id="chat-close" class="chat-close" aria-label="關閉對話">✕</button>
+<div id="chat-widget" class="hidden-page">
+  <div id="chat-panel" class="chat-panel hidden" role="dialog" aria-label="AI 家教對話視窗">
+    <div class="chat-header">
+      <div class="chat-header-title"><img src="SRC/111.png" alt="能源小教練頭像" class="chat-avatar">能源小教練</div>
+      <button type="button" id="chat-close" class="chat-close" aria-label="關閉對話">✕</button>
+    </div>
+    <div id="chat-messages" class="chat-messages"></div>
+    <form id="chat-form" class="chat-input-row">
+      <input id="chat-input" type="text" placeholder="問問能源轉型的問題吧…" autocomplete="off" />
+      <button type="submit" class="chat-send" aria-label="送出">➤</button>
+    </form>
   </div>
-  <div id="chat-messages" class="chat-messages"></div>
-  <form id="chat-form" class="chat-input-row">
-    <input id="chat-input" type="text" placeholder="問問能源轉型的問題吧…" autocomplete="off" />
-    <button type="submit" class="chat-send" aria-label="送出">➤</button>
-  </form>
+  <button type="button" id="chat-bubble" class="chat-bubble" aria-label="打開 AI 家教對話"><img src="SRC/111.png" alt="AI 家教頭像"></button>
 </div>
-<button type="button" id="chat-bubble" class="chat-bubble" aria-label="打開 AI 家教對話"><img src="SRC/111.png" alt="AI 家教頭像"></button>
 
 <script>
   (function () {
@@ -947,7 +1375,10 @@
       }
     }
 
-    bubble.addEventListener("click", () => togglePanel());
+    bubble.addEventListener("click", () => {
+      togglePanel();
+      recordLog("點擊按鈕：開關 AI 家教對話框");
+    });
     closeBtn.addEventListener("click", () => togglePanel(false));
 
     form.addEventListener("submit", async (e) => {
@@ -957,6 +1388,7 @@
 
       addMessage("user", text);
       chatHistory.push({ role: "user", content: text });
+      recordLog(`輸入文字（AI 對話）：${text}`);
       input.value = "";
       isWaiting = true;
 
