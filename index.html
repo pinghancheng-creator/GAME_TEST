@@ -741,11 +741,19 @@
 <div id="start-page" class="start-page">
   <div class="start-card">
     <h1>⚡ 能源轉型闖關遊戲</h1>
-    <p>開始挑戰前，請先填寫你的基本資料：</p>
+    <p>請輸入你的帳號資料登入（帳號密碼由管理員提供，不需自行註冊）：</p>
     <form id="start-form" class="start-form" novalidate>
       <label>
         姓名
         <input type="text" id="player-name" placeholder="請輸入姓名" required>
+      </label>
+      <label>
+        帳號 ID
+        <input type="text" id="player-id" placeholder="請輸入帳號 ID" required>
+      </label>
+      <label>
+        密碼
+        <input type="password" id="player-password" placeholder="請輸入密碼" required>
       </label>
       <label>
         性別
@@ -765,7 +773,7 @@
         <input type="email" id="player-email" placeholder="請輸入 Email" required>
       </label>
       <div class="start-error" id="start-error"></div>
-      <button type="submit">填入完成，開始遊戲</button>
+      <button type="submit" id="start-submit">登入並開始遊戲</button>
     </form>
   </div>
 </div>
@@ -1257,26 +1265,59 @@
     );
   }
 
-  document.getElementById("start-form").addEventListener("submit", (e) => {
+  // 向 GAS 的 "login" 工作表核對帳號密碼：
+  // 只有 id/password 正確、且該筆資料的 userName、userEmail 都非空白，才算通過
+  async function checkLogin(id, password) {
+    try {
+      const res = await fetch(SAVE_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "login", id, password }),
+      });
+      const text = (await res.text()).trim();
+      return { ok: text === "OK", message: text };
+    } catch (err) {
+      console.error("登入檢查失敗：", err);
+      return { ok: false, message: "無法連線至伺服器，請稍後再試。" };
+    }
+  }
+
+  document.getElementById("start-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const nameInput = document.getElementById("player-name");
+    const idInput = document.getElementById("player-id");
+    const passwordInput = document.getElementById("player-password");
     const genderInput = document.getElementById("player-gender");
     const ageInput = document.getElementById("player-age");
     const emailInput = document.getElementById("player-email");
     const errorEl = document.getElementById("start-error");
+    const submitBtn = document.getElementById("start-submit");
 
     const name = nameInput.value.trim();
+    const id = idInput.value.trim();
+    const password = passwordInput.value.trim();
     const gender = genderInput.value;
     const age = ageInput.value;
     const email = emailInput.value.trim();
 
-    if (!name || !gender || !age || !email) {
-      errorEl.textContent = "請完整填寫姓名、性別、年齡與 Email 後再開始遊戲。";
+    if (!name || !id || !password || !gender || !age || !email) {
+      errorEl.textContent = "請完整填寫姓名、帳號、密碼、性別、年齡與 Email 後再登入。";
       return;
     }
 
     if (!emailInput.checkValidity()) {
       errorEl.textContent = "請輸入正確格式的 Email。";
+      return;
+    }
+
+    errorEl.textContent = "登入中，請稍候…";
+    submitBtn.disabled = true;
+
+    const loginResult = await checkLogin(id, password);
+
+    if (!loginResult.ok) {
+      submitBtn.disabled = false;
+      errorEl.textContent = loginResult.message || "帳號或密碼錯誤，請確認後再試一次。";
       return;
     }
 
@@ -1287,7 +1328,7 @@
     userAge = age;
     userEmail = email;
 
-    sendProfileToGAS("使用者輸入基本資料並開始遊戲");
+    sendProfileToGAS("使用者登入成功並開始遊戲");
     flushLogQueue();
     startGame();
   });
