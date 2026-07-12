@@ -857,8 +857,8 @@
 
 <script>
   // ---------- Google Apps Script 使用者資料 / 行為紀錄 ----------
-  // 部署 GAS 網頁應用程式後，把網址貼在這裡
-  const GAS_WEB_APP_URL = "YOUR_GAS_WEB_APP_URL_HERE";
+  // 前端不直接打 GAS，改送到 /api/save，由 Vercel Serverless Function 轉送到 GAS_URL（環境變數）
+  const SAVE_ENDPOINT = "/api/save";
 
   const LOG_QUEUE_KEY = "energyGameLogQueue";
   const LOG_BATCH_SIZE = 5;
@@ -879,23 +879,18 @@
     localStorage.setItem(LOG_QUEUE_KEY, JSON.stringify(logQueue));
   }
 
-  // 送資料到 GAS：用 text/plain 避免瀏覽器發出 CORS 預檢請求（GAS 網頁應用程式不處理 OPTIONS）
+  // 送資料到後端代理（/api/save），再由伺服器端轉送到 GAS
   async function sendToGAS(payload) {
-    if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL === "YOUR_GAS_WEB_APP_URL_HERE") {
-      console.warn("尚未設定 GAS_WEB_APP_URL，略過送出：", payload);
-      return false;
-    }
-
     try {
-      const res = await fetch(GAS_WEB_APP_URL, {
+      const res = await fetch(SAVE_ENDPOINT, {
         method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       const text = await res.text();
       return text.trim() === "OK";
     } catch (err) {
-      console.error("送出至 GAS 失敗：", err);
+      console.error("送出至 /api/save 失敗：", err);
       return false;
     }
   }
