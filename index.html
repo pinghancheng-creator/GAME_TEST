@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>能源轉型闖關遊戲</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card-bg: #1e293b;
+    --text: #f1f5f9;
+    --sub-text: #94a3b8;
+    --accent: #38bdf8;
+    --green: #22c55e;
+    --orange: #f59e0b;
+    --red: #ef4444;
+    --border: #334155;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  header {
+    text-align: center;
+    padding: 1.5rem 1rem 1rem;
+  }
+
+  header h1 {
+    margin: 0 0 0.4rem;
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+  }
+
+  header p {
+    margin: 0;
+    color: var(--sub-text);
+    font-size: 0.95rem;
+  }
+
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem 3rem;
+  }
+
+  .scene {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .sky {
+    position: relative;
+    border-radius: 16px 16px 0 0;
+    min-height: 170px;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #87ceeb, #cdeffb);
+    transition: background 0.8s ease;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .sun {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 2rem;
+    transition: opacity 0.8s ease;
+  }
+
+  .plants-layer {
+    display: flex;
+    align-items: flex-end;
+    padding: 0 0.5rem;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+  }
+
+  .building {
+    flex: 0 0 auto;
+    width: 54px;
+    height: 92px;
+    margin-left: -14px;
+    transition: transform 0.35s ease, filter 0.35s ease;
+  }
+
+  .building:first-child { margin-left: 0.4rem; }
+
+  .building svg { width: 100%; height: 100%; display: block; }
+
+  .building.depth-front {
+    z-index: 2;
+    transform: translateY(0) scale(1);
+  }
+
+  .building.depth-back {
+    z-index: 1;
+    transform: translateY(-16px) scale(0.8);
+    filter: brightness(0.88);
+  }
+
+  .smoke {
+    animation: smoke-rise 3s ease-out infinite;
+    transform-origin: center;
+  }
+
+  .smoke.s2 { animation-delay: 1.1s; }
+
+  @keyframes smoke-rise {
+    0%   { transform: translateY(0) scale(1); opacity: 0.8; }
+    100% { transform: translateY(-20px) scale(1.7); opacity: 0; }
+  }
+
+  .blades {
+    transform-origin: 30px 30px;
+    animation: spin-blades 4s linear infinite;
+  }
+
+  @keyframes spin-blades {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  .ground {
+    position: relative;
+    height: 84px;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #4d7c0f, #365314);
+    border-radius: 0 0 16px 16px;
+    border-top: 3px solid #3f6212;
+  }
+
+  .person-wrap {
+    position: absolute;
+    bottom: 4px;
+    width: 22px;
+    height: 48px;
+    left: 0%;
+    animation-name: walk-across;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  .person-wrap.scared { animation-name: walk-across-scared; }
+
+  @keyframes walk-across {
+    0%   { left: 2%;  transform: scaleX(1); }
+    48%  { left: 92%; transform: scaleX(1); }
+    50%  { left: 92%; transform: scaleX(-1); }
+    98%  { left: 2%;  transform: scaleX(-1); }
+    100% { left: 2%;  transform: scaleX(1); }
+  }
+
+  @keyframes walk-across-scared {
+    0%   { left: 2%;  transform: scaleX(1) translateY(0); }
+    12%  { transform: scaleX(1) translateY(-3px); }
+    24%  { transform: scaleX(1) translateY(0); }
+    48%  { left: 92%; transform: scaleX(1) translateY(0); }
+    50%  { left: 92%; transform: scaleX(-1) translateY(0); }
+    62%  { transform: scaleX(-1) translateY(-3px); }
+    74%  { transform: scaleX(-1) translateY(0); }
+    98%  { left: 2%;  transform: scaleX(-1) translateY(0); }
+    100% { left: 2%;  transform: scaleX(1) translateY(0); }
+  }
+
+  .person-figure { width: 100%; height: 100%; display: block; overflow: visible; }
+
+  .leg-l, .leg-r, .arm-l, .arm-r {
+    transform-box: fill-box;
+    transform-origin: top center;
+    animation-duration: 0.6s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  .leg-l, .arm-r { animation-name: swing-a; }
+  .leg-r, .arm-l { animation-name: swing-b; }
+
+  @keyframes swing-a {
+    0%, 100% { transform: rotate(22deg); }
+    50%      { transform: rotate(-22deg); }
+  }
+
+  @keyframes swing-b {
+    0%, 100% { transform: rotate(-22deg); }
+    50%      { transform: rotate(22deg); }
+  }
+
+  .plants-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .plants-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 1024px) {
+    .plants-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (min-width: 1400px) {
+    .plants-grid { grid-template-columns: repeat(5, 1fr); }
+  }
+
+  .plant-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .plant-card h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .plant-icon { font-size: 1.3rem; }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--sub-text);
+  }
+
+  .stat-row span.value {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .tag-green { background: rgba(34,197,94,0.15); color: var(--green); }
+  .tag-orange { background: rgba(245,158,11,0.15); color: var(--orange); }
+  .tag-red { background: rgba(239,68,68,0.15); color: var(--red); }
+
+  .count-control {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 0.4rem;
+  }
+
+  .count-control button {
+    width: 2.4rem;
+    height: 2.4rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #0f172a;
+    font-size: 1.3rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.08s ease, opacity 0.15s ease;
+  }
+
+  .count-control button:hover { opacity: 0.85; }
+  .count-control button:active { transform: scale(0.92); }
+  .count-control button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .count-display {
+    font-size: 1.3rem;
+    font-weight: 700;
+    min-width: 2.5rem;
+    text-align: center;
+  }
+
+  .summary-section {
+    margin-top: 2rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+  }
+
+  .summary-section h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+  }
+
+  @media (min-width: 640px) {
+    .summary-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .summary-item {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 0.8rem;
+    text-align: center;
+  }
+
+  .summary-item .label {
+    font-size: 0.8rem;
+    color: var(--sub-text);
+  }
+
+  .summary-item .amount {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 0.2rem;
+  }
+
+  .summary-item .rate-hint {
+    font-size: 0.7rem;
+    color: var(--sub-text);
+    margin-top: 0.15rem;
+  }
+
+  .goal-section {
+    margin-top: 1.2rem;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  .goal-success {
+    background: rgba(34,197,94,0.15);
+    color: var(--green);
+  }
+
+  .goal-fail {
+    background: rgba(239,68,68,0.12);
+    color: var(--red);
+  }
+
+  .goal-detail {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--sub-text);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 1rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ 能源轉型闖關遊戲</h1>
+  <p>調整各種電廠的數量，找到發電量、成本、排碳與環境風險之間的平衡，挑戰成功通關！</p>
+</header>
+
+<section class="scene">
+  <div class="sky" id="scene-sky">
+    <span class="sun" id="scene-sun">☀️</span>
+    <div class="plants-layer" id="scene-plants"></div>
+  </div>
+  <div class="ground" id="scene-people"></div>
+</section>
+
+<main>
+  <div id="plants-grid" class="plants-grid"></div>
+
+  <section class="summary-section">
+    <h2>📊 目前總計</h2>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="label">總發電量</div>
+        <div class="amount" id="sum-power">0</div>
+      </div>
+      <div class="summary-item">
+        <div class="label">總建造成本</div>
+        <div class="amount" id="sum-cost">0</div>
+      </div>
+      <div class="summary-item">
+        <div class="label">總排碳量（累積）</div>
+        <div class="amount" id="sum-carbon">0</div>
+        <div class="rate-hint" id="carbon-rate-hint"></div>
+      </div>
+      <div class="summary-item">
+        <div class="label">總環境風險</div>
+        <div class="amount" id="sum-risk">0</div>
+      </div>
+    </div>
+
+    <div id="goal-status" class="goal-section">
+      <div id="goal-message">計算中...</div>
+      <div class="goal-detail" id="goal-detail"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const plants = [
+    { id: "thermal", icon: "🔥", name: "火力發電廠", count: 8, power: 18, cost: 8, carbon: 16, risk: 8 },
+    { id: "wind",    icon: "🌬️", name: "風力發電廠", count: 2, power: 12, cost: 10, carbon: 0, risk: 3 },
+    { id: "hydro",   icon: "💧", name: "水力發電廠", count: 2, power: 15, cost: 12, carbon: 0, risk: 2 },
+    { id: "solar",   icon: "☀️", name: "太陽能發電廠", count: 3, power: 9, cost: 9, carbon: 0, risk: 1 },
+    { id: "nuclear", icon: "☢️", name: "核能發電廠", count: 0, power: 20, cost: 15, carbon: 1, risk: 4 }
+  ];
+
+  const GOAL = {
+    minPower: 180,
+    maxCarbon: 130,
+    maxRisk: 70,
+    maxCost: 220
+  };
+
+  function riskTag(value, thresholds) {
+    if (value <= thresholds[0]) return { cls: "tag-green", label: "低" };
+    if (value <= thresholds[1]) return { cls: "tag-orange", label: "中" };
+    return { cls: "tag-red", label: "高" };
+  }
+
+  function renderPlants() {
+    const grid = document.getElementById("plants-grid");
+    grid.innerHTML = "";
+
+    plants.forEach(plant => {
+      const carbonTag = riskTag(plant.carbon, [0, 8]);
+      const riskTagInfo = riskTag(plant.risk, [2, 5]);
+
+      const card = document.createElement("div");
+      card.className = "plant-card";
+      card.innerHTML = `
+        <h2><span class="plant-icon">${plant.icon}</span>${plant.name}</h2>
+        <div class="stat-row"><span>發電量</span><span class="value">${plant.power}</span></div>
+        <div class="stat-row"><span>建造成本</span><span class="value">${plant.cost}</span></div>
+        <div class="stat-row"><span>排碳量</span><span class="value">${plant.carbon} <span class="tag ${carbonTag.cls}">${carbonTag.label}</span></span></div>
+        <div class="stat-row"><span>環境風險</span><span class="value">${plant.risk} <span class="tag ${riskTagInfo.cls}">${riskTagInfo.label}</span></span></div>
+        <div class="count-control">
+          <button type="button" data-action="dec" data-id="${plant.id}" ${plant.count <= 0 ? "disabled" : ""}>−</button>
+          <div class="count-display">${plant.count}</div>
+          <button type="button" data-action="inc" data-id="${plant.id}">＋</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    grid.querySelectorAll("button[data-action]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const delta = btn.dataset.action === "inc" ? 1 : -1;
+        changePlantCount(btn.dataset.id, delta);
+      });
+    });
+  }
+
+  function changePlantCount(id, delta) {
+    const plant = plants.find(p => p.id === id);
+    if (!plant) return;
+    plant.count = Math.max(0, plant.count + delta);
+    renderPlants();
+    updateSummary();
+  }
+
+  function lerpColor(from, to, t) {
+    const r = Math.round(from[0] + (to[0] - from[0]) * t);
+    const g = Math.round(from[1] + (to[1] - from[1]) * t);
+    const b = Math.round(from[2] + (to[2] - from[2]) * t);
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
+  const MAX_BUILDINGS_PER_PLANT = 16;
+
+  // 各電廠建築造型（SVG，viewBox 0 0 60 100）
+  const PLANT_SVG = {
+    thermal: `
+      <svg viewBox="0 0 60 100">
+        <rect x="16" y="6" width="7" height="34" fill="#3f3f46"/>
+        <rect x="33" y="14" width="7" height="26" fill="#3f3f46"/>
+        <circle class="smoke s1" cx="19.5" cy="6" r="4" fill="#a1a1aa"/>
+        <circle class="smoke s2" cx="36.5" cy="14" r="3.2" fill="#a1a1aa"/>
+        <rect x="8" y="40" width="44" height="55" rx="2" fill="#52525b" stroke="#27272a" stroke-width="1"/>
+        <rect x="14" y="48" width="6" height="7" fill="#fbbf24"/>
+        <rect x="27" y="48" width="6" height="7" fill="#fbbf24"/>
+        <rect x="40" y="48" width="6" height="7" fill="#fbbf24"/>
+        <rect x="14" y="62" width="6" height="7" fill="#fbbf24"/>
+        <rect x="27" y="62" width="6" height="7" fill="#fbbf24"/>
+        <rect x="40" y="62" width="6" height="7" fill="#fbbf24"/>
+      </svg>`,
+    wind: `
+      <svg viewBox="0 0 60 100">
+        <rect x="27" y="32" width="5" height="63" fill="#e2e8f0"/>
+        <g class="blades">
+          <rect x="28.5" y="4" width="2.4" height="28" rx="1.2" fill="#cbd5e1"/>
+          <rect x="28.5" y="4" width="2.4" height="28" rx="1.2" fill="#cbd5e1" transform="rotate(120 30 32)"/>
+          <rect x="28.5" y="4" width="2.4" height="28" rx="1.2" fill="#cbd5e1" transform="rotate(240 30 32)"/>
+          <circle cx="30" cy="32" r="3.2" fill="#94a3b8"/>
+        </g>
+      </svg>`,
+    hydro: `
+      <svg viewBox="0 0 60 100">
+        <polygon points="6,95 17,42 43,42 54,95" fill="#64748b" stroke="#475569" stroke-width="1"/>
+        <rect x="21" y="55" width="18" height="18" fill="#0ea5e9" opacity="0.85"/>
+        <rect x="0" y="90" width="60" height="8" fill="#0ea5e9"/>
+        <rect x="0" y="90" width="60" height="8" fill="#38bdf8" opacity="0.5"/>
+      </svg>`,
+    solar: `
+      <svg viewBox="0 0 60 100">
+        <rect x="26" y="58" width="4" height="37" fill="#71717a"/>
+        <g transform="rotate(-12 30 55)">
+          <rect x="4" y="44" width="52" height="20" rx="1.5" fill="#1d4ed8" stroke="#1e3a8a" stroke-width="1"/>
+          <line x1="17" y1="44" x2="17" y2="64" stroke="#1e3a8a" stroke-width="0.8"/>
+          <line x1="30" y1="44" x2="30" y2="64" stroke="#1e3a8a" stroke-width="0.8"/>
+          <line x1="43" y1="44" x2="43" y2="64" stroke="#1e3a8a" stroke-width="0.8"/>
+        </g>
+      </svg>`,
+    nuclear: `
+      <svg viewBox="0 0 60 100">
+        <path d="M16,95 C4,72 4,50 16,34 C21,24 39,24 44,34 C56,50 56,72 44,95 Z" fill="#a1a1aa" stroke="#71717a" stroke-width="1"/>
+        <circle class="smoke s1" cx="30" cy="18" r="6" fill="#f1f5f9" opacity="0.85"/>
+        <circle class="smoke s2" cx="23" cy="12" r="4" fill="#f1f5f9" opacity="0.6"/>
+      </svg>`
+  };
+
+  function buildingHTML(plantId, idx) {
+    const depthClass = idx % 2 === 0 ? "depth-front" : "depth-back";
+    return `<div class="building ${depthClass}">${PLANT_SVG[plantId]}</div>`;
+  }
+
+  // 全身走路人物 SVG，依心情變化頭部顏色、眉毛與嘴巴
+  const MOODS = {
+    calm:    { head: "#fde68a", mouth: "M9,13 Q12,16.5 15,13", brow: 0 },
+    neutral: { head: "#fde68a", mouth: "M9,13.5 L15,13.5", brow: 4 },
+    worried: { head: "#fdba74", mouth: "M9,14.5 Q12,12 15,14.5", brow: 10 },
+    scared:  { head: "#fca5a5", mouth: "M9,12.5 Q12,19 15,12.5 Q12,15.5 9,12.5 Z", brow: 16 }
+  };
+
+  function personSVG(mood) {
+    const m = MOODS[mood];
+    return `
+      <svg class="person-figure" viewBox="0 0 24 50">
+        <rect class="leg leg-l" x="8.2" y="34" width="3" height="14" rx="1.4" fill="#334155"/>
+        <rect class="leg leg-r" x="12.8" y="34" width="3" height="14" rx="1.4" fill="#334155"/>
+        <rect class="arm arm-l" x="3" y="18" width="3" height="14" rx="1.4" fill="${m.head}"/>
+        <rect class="arm arm-r" x="18" y="18" width="3" height="14" rx="1.4" fill="${m.head}"/>
+        <rect x="7" y="16" width="10" height="20" rx="3" fill="#0ea5e9"/>
+        <circle cx="12" cy="10" r="7" fill="${m.head}"/>
+        <line x1="8" y1="${7 - m.brow / 20}" x2="10.3" y2="${6.4 - m.brow / 12}" stroke="#78350f" stroke-width="0.9" stroke-linecap="round"/>
+        <line x1="16" y1="${7 - m.brow / 20}" x2="13.7" y2="${6.4 - m.brow / 12}" stroke="#78350f" stroke-width="0.9" stroke-linecap="round"/>
+        <circle cx="9.6" cy="9.5" r="0.9" fill="#1f2937"/>
+        <circle cx="14.4" cy="9.5" r="0.9" fill="#1f2937"/>
+        <path d="${m.mouth}" stroke="#7c2d12" stroke-width="1" fill="none"/>
+      </svg>`;
+  }
+
+  function renderScene(totals) {
+    // 天空：排碳量越高越黑
+    const carbonRatio = Math.min(totals.carbon / (GOAL.maxCarbon * 2), 1);
+    const skyTop = lerpColor([135, 206, 235], [10, 10, 18], carbonRatio);
+    const skyBottom = lerpColor([205, 239, 251], [40, 40, 50], carbonRatio);
+    document.getElementById("scene-sky").style.background =
+      `linear-gradient(to bottom, ${skyTop}, ${skyBottom})`;
+    document.getElementById("scene-sun").style.opacity = String(Math.max(1 - carbonRatio, 0.12));
+
+    // 電廠建築：依各電廠數量增減，前後重疊排列
+    const plantsLayer = document.getElementById("scene-plants");
+    let buildingsHTML = "";
+    let idx = 0;
+    plants.forEach(plant => {
+      const n = Math.min(plant.count, MAX_BUILDINGS_PER_PLANT);
+      for (let i = 0; i < n; i++) {
+        buildingsHTML += buildingHTML(plant.id, idx);
+        idx++;
+      }
+    });
+    plantsLayer.innerHTML = buildingsHTML;
+
+    // 人民表情與動作：環境風險越高越恐懼
+    const riskRatio = Math.min(totals.risk / (GOAL.maxRisk * 1.5), 1);
+    let mood = "calm";
+    if (riskRatio >= 0.75) mood = "scared";
+    else if (riskRatio >= 0.45) mood = "worried";
+    else if (riskRatio >= 0.2) mood = "neutral";
+
+    const peopleLayer = document.getElementById("scene-people");
+    const PEOPLE_COUNT = 8;
+    let peopleHTML = "";
+    for (let i = 0; i < PEOPLE_COUNT; i++) {
+      const duration = 7 + (i % 5) * 2.2;
+      const delay = -(i * 1.7);
+      const bottom = 4 + (i % 3) * 10;
+      const scaredClass = mood === "scared" ? " scared" : "";
+      peopleHTML += `<div class="person-wrap${scaredClass}" style="animation-duration:${duration}s; animation-delay:${delay}s; bottom:${bottom}px;">${personSVG(mood)}</div>`;
+    }
+    peopleLayer.innerHTML = peopleHTML;
+  }
+
+  // 環境風險為固定值：依目前電廠數量即時計算，不會累積
+  // 排碳量為累積值：每 10 秒依當下電廠配置排放一次，永久累加（見 tickCarbon）
+  let accumulatedCarbon = 0;
+
+  function carbonRatePerTick() {
+    return plants.reduce((sum, p) => sum + p.count * p.carbon, 0);
+  }
+
+  function tickCarbon() {
+    accumulatedCarbon += carbonRatePerTick();
+    updateSummary();
+  }
+
+  function calcTotals() {
+    const totals = plants.reduce((totals, p) => {
+      totals.power += p.count * p.power;
+      totals.cost += p.count * p.cost;
+      totals.risk += p.count * p.risk;
+      return totals;
+    }, { power: 0, cost: 0, risk: 0 });
+    totals.carbon = accumulatedCarbon;
+    return totals;
+  }
+
+  function checkGoal(totals) {
+    return {
+      power: totals.power >= GOAL.minPower,
+      carbon: totals.carbon < GOAL.maxCarbon,
+      risk: totals.risk < GOAL.maxRisk,
+      cost: totals.cost <= GOAL.maxCost
+    };
+  }
+
+  function updateSummary() {
+    const totals = calcTotals();
+
+    renderScene(totals);
+
+    document.getElementById("sum-power").textContent = totals.power;
+    document.getElementById("sum-cost").textContent = totals.cost;
+    document.getElementById("sum-carbon").textContent = totals.carbon;
+    document.getElementById("sum-risk").textContent = totals.risk;
+    document.getElementById("carbon-rate-hint").textContent = `每 10 秒 +${carbonRatePerTick()}（持續累積）`;
+
+    const results = checkGoal(totals);
+    const success = Object.values(results).every(Boolean);
+
+    const statusBox = document.getElementById("goal-status");
+    const message = document.getElementById("goal-message");
+    const detail = document.getElementById("goal-detail");
+
+    statusBox.classList.remove("goal-success", "goal-fail");
+    statusBox.classList.add(success ? "goal-success" : "goal-fail");
+    message.textContent = success ? "🎉 成功通關！你完成了能源轉型挑戰！" : "尚未達成目標，再試一次！";
+
+    detail.innerHTML = `
+      <span>${results.power ? "✅" : "❌"} 發電量 ≥ ${GOAL.minPower}</span>
+      <span>${results.carbon ? "✅" : "❌"} 排碳量 &lt; ${GOAL.maxCarbon}</span>
+      <span>${results.risk ? "✅" : "❌"} 環境風險 &lt; ${GOAL.maxRisk}</span>
+      <span>${results.cost ? "✅" : "❌"} 建造成本 ≤ ${GOAL.maxCost}</span>
+    `;
+  }
+
+  function init() {
+    renderPlants();
+    updateSummary();
+    setInterval(tickCarbon, 10000);
+  }
+
+  init();
+</script>
+
+</body>
+</html>
